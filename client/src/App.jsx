@@ -1,29 +1,21 @@
-import { Provider } from 'react-redux';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { Container, AppBar, Toolbar, Typography } from '@mui/material';
-import { store } from './store'; // Updated import path
-import TaskList from './components/TaskList';
-
-const theme = createTheme();
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Dashboard from "./pages/Dashboard";
+import CreateTask from "./pages/CreateTask";
+import EditTask from "./pages/EditTask";
 
 function App() {
   return (
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <AppBar position="static">
-          <Toolbar>
-            <Typography variant="h6">
-              Task Management App
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Container>
-          <TaskList />
-        </Container>
-      </ThemeProvider>
-    </Provider>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/create-task" element={<CreateTask />} />
+        <Route path="/edit-task/:id" element={<EditTask />} />
+      </Routes>
+    </Router>
   );
 }
 

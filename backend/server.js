@@ -12,7 +12,6 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Add this middleware to set CSP headers
 app.use((req, res, next) => {
   res.setHeader(
       'Content-Security-Policy',
@@ -23,22 +22,18 @@ app.use((req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-// Root route
 app.get('/', (req, res) => {
   res.send('Welcome to the Task Management API');
 });
 
-// User signup
 app.post('/api/signup', async (req, res) => {
   const { username, password } = req.body;
 
-  // validation
   if (!username || !password) {
     return res.status(400).json({ message: "Please provide a username and password" });
   }
 
   try {
-    // Check if the username already exists
     const existingUser = await User.findOne({ where: { username } });
     if (existingUser) {
       return res.status(400).json({ message: "Username already exists" });
@@ -52,7 +47,6 @@ app.post('/api/signup', async (req, res) => {
   }
 });
 
-// User login
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -76,30 +70,25 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Protected routes
 app.use('/api/tasks', authMiddleware);
 
-// GET all tasks with pagination
-app.get('/api/tasks', authMiddleware, async (req, res) => {
-  const { page = 1, limit = 10 } = req.query; // Default to page 1, limit 10
 
-  // Convert page and limit to integers
+app.get('/api/tasks', authMiddleware, async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+
   const pageNumber = parseInt(page, 10);
   const pageSize = parseInt(limit, 10);
 
-  // Calculate offset (how many records to skip)
   const offset = (pageNumber - 1) * pageSize;
 
   try {
-    // Find tasks with limit and offset for pagination
     const tasks = await Task.findAndCountAll({
       where: { UserId: req.user.id },
       limit: pageSize,
       offset: offset,
-      order: [['createdAt', 'DESC']] // Optional: order by created date
+      order: [['createdAt', 'DESC']]
     });
 
-    // Send paginated response with total count
     res.json({
       totalTasks: tasks.count,
       totalPages: Math.ceil(tasks.count / pageSize),
@@ -111,7 +100,6 @@ app.get('/api/tasks', authMiddleware, async (req, res) => {
   }
 });
 
-// POST a new task (with authMiddleware)
 app.post('/api/tasks', authMiddleware, async (req, res) => {
   const { title, status, priority } = req.body;
 
@@ -130,7 +118,7 @@ app.post('/api/tasks', authMiddleware, async (req, res) => {
   try {
     const newTask = await Task.create({
       ...req.body,
-      UserId: req.user.id // Use the authenticated user's ID
+      UserId: req.user.id
     });
     res.status(201).json(newTask);
   } catch (error) {
@@ -139,11 +127,10 @@ app.post('/api/tasks', authMiddleware, async (req, res) => {
   }
 });
 
-// PUT (update) a task (with authMiddleware)
+
 app.put('/api/tasks/:id', authMiddleware, async (req, res) => {
   const { title, status, priority } = req.body;
 
-  // validation
   if (title && !title.trim()) {
     return res.status(400).json({ message: "Title cannot be empty" });
   }
@@ -171,7 +158,6 @@ app.put('/api/tasks/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// DELETE a task (with authMiddleware)
 app.delete('/api/tasks/:id', authMiddleware, async (req, res) => {
   try {
     const deleted = await Task.destroy({
@@ -187,7 +173,6 @@ app.delete('/api/tasks/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// Error-handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: "Server error", error: err.message });
