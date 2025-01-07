@@ -1,6 +1,6 @@
 # Task Management Web Application
 
-![Task Management overview](assets/napkin-selection.png)
+![Task Management overview](assets/flow-chart.png)
 
 This Task Management Web Application allows users to sign up, log in, and manage their tasks in a secure and user-friendly environment. The backend is built with Node.js and Express, utilizing Sequelize ORM and JWT-based authentication. The frontend, built with React.js and Tailwind CSS, offers an intuitive interface for managing tasks.
 
